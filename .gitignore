@@ -190,3 +190,4 @@ test.py
 
 !/.venv/
 /data
+pnpm-lock.yaml
