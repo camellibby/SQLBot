@@ -11,6 +11,16 @@ export default defineConfig(({ mode }) => {
   console.info(env)
   return {
     base: './',
+    server: {
+      cors: true,
+      proxy: {
+        '/api/v1': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          ws: true,
+        },
+      },
+    },
     plugins: [
       vue(),
       AutoImport({

@@ -519,7 +519,7 @@
     "new_conversation": "新会话",
     "send": "发送",
     "stop_replying": "停止回复",
-    "i_am_sqlbot": "你好，我是SQLBot",
+    "i_am_sqlbot": "你好，我是小业",
     "predict_data_etc": "我可以查询数据、生成图表、分析数据、预测数据等。",
     "intelligent_data_query": "赶快开启智能问数吧～"
   },
@@ -588,7 +588,7 @@
     "new_conversation": "新建对话",
     "send": "发送",
     "stop_replying": "停止回答",
-    "i_am_sqlbot": "你好，我是 SQLBot",
+    "i_am_sqlbot": "你好，我是小业",
     "predict_data_etc": "我可以查询数据、生成图表、检测数据异常、预测数据等",
     "intelligent_data_query": "赶快开启智能问数吧～",
     "origin_format_error": "格式错误，http或https开头，不能以 / 结尾",
@@ -604,7 +604,7 @@
     "left": "左",
     "right": "右",
     "welcome_description": "欢迎语描述",
-    "data_analysis_now": "我可以查询数据、生成图表、检测数据异常、预测数据等赶快开启智能问数吧～",
+    "data_analysis_now": "我是武汉理工产业园的智能顾问，专注于为您提供关于产业园的全面资讯与服务。\n我熟知产业园的产业聚焦领域、招商入驻政策、产学研合作模式、创新孵化体系以及最新的园区动态。无论您是寻求合作的企业、希望创业的师生团队，还是想了解项目的合作伙伴，我都能为您提供专业、高效的解答。\n为了更精准地协助您，您可以从下面的问题开始探索，或直接提出您的具体需求。",
     "window_entrance_icon": "浮窗入口图标"
   },
   "chat": {
