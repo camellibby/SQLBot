@@ -153,8 +153,8 @@
                 v-if="logoAssistant"
                 :src="logoAssistant"
                 class="logo"
-                width="30px"
-                height="30px"
+                width="100px"
+                height="100px"
                 alt=""
               />
               <el-icon v-else size="32">
