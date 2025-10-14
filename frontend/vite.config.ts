@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
   return {
     base: './',
     server: {
+      port: 5174,
       cors: true,
       proxy: {
         '/api/v1': {
