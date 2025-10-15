@@ -1,4 +1,7 @@
 <template>
+  {{assistantStore.assistant}}11
+  {{!assistantStore.pageEmbedded}}11
+  {{!assistantStore.type != 4}}11
   <el-popover
     v-if="assistantStore.assistant && !assistantStore.pageEmbedded && assistantStore.type != 4"
     :width="280"
