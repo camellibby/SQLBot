@@ -20,7 +20,7 @@ WORKDIR ${APP_HOME}
 
 COPY ./frontend ${UI_HOME}
 
-RUN cd ${UI_HOME}; npm install; npm run build
+RUN ls ${SQLBOT_HOME};cd ${UI_HOME}; npm install; npm run build
 
 # Install dependencies
 RUN test -f "./uv.lock" && \
