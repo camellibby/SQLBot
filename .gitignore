@@ -191,3 +191,5 @@ test.py
 !/.venv/
 /data
 pnpm-lock.yaml
+backend/logs
+frontend/public/xpack_static
