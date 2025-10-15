@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libgif-dev \
     librsvg2-dev \
-    ca-certificates \
- RUN cd /tmp && \
+    ca-certificates
+RUN cd /tmp && \
     curl -O https://nodejs.org/dist/v22.20.0/node-v22.20.0-linux-x64.tar.xz && \
     tar -xJf node-v22.20.0-linux-x64.tar.xz -C /usr/local --strip-components=1 && \
     rm -f node-v22.20.0-linux-x64.tar.xz
