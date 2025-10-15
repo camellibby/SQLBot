@@ -22,10 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgif-dev \
     librsvg2-dev \
     ca-certificates \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && curl -qL https://www.npmjs.com/install.sh | sh - \
-    && apt-get install -y --allow-downgrades nodejs=22.20.0-1nodesource1 \
-    && curl -L --connect-timeout 60 -m 1800 https://fit2cloud-support.oss-cn-beijing.aliyuncs.com/xpack-license/get-validator-linux | sh \
+ RUN cd /tmp && \
+    curl -O https://nodejs.org/dist/v22.20.0/node-v22.20.0-linux-x64.tar.xz && \
+    tar -xJf node-v22.20.0-linux-x64.tar.xz -C /usr/local --strip-components=1 && \
+    rm -f node-v22.20.0-linux-x64.tar.xz
+RUN curl -L --connect-timeout 60 -m 1800 https://fit2cloud-support.oss-cn-beijing.aliyuncs.com/xpack-license/get-validator-linux | sh \
     && rm -rf /var/lib/apt/lists/* \
     && chmod g+xr /usr/bin/ld.so \
     && chmod g+x /usr/local/bin/python*
