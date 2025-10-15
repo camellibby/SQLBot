@@ -18,7 +18,7 @@ RUN mkdir -p ${APP_HOME} ${UI_HOME}
 
 WORKDIR ${APP_HOME}
 
-COPY frontend ${UI_HOME}
+COPY ./frontend ${UI_HOME}
 
 RUN cd ${UI_HOME}; npm install; npm run build
 
