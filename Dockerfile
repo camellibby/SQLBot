@@ -18,9 +18,9 @@ RUN mkdir -p ${APP_HOME} ${UI_HOME}
 
 WORKDIR ${APP_HOME}
 
-COPY frontend /tmp/frontend
+COPY frontend ${UI_HOME}
 
-RUN cd /tmp/frontend; npm install; npm run build; mv dist ${UI_HOME}/dist
+RUN cd ${UI_HOME}; npm install; npm run build
 
 # Install dependencies
 RUN test -f "./uv.lock" && \
