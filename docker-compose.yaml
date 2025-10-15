@@ -1,28 +1,17 @@
 services:
-  db:
-    image: pgvector/pgvector:pg17
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-root}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Password123@pg}
-      POSTGRES_DB: ${POSTGRES_DB:-sqlbot}
-    volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
-    networks:
-      - sqlbot-network
   sqlbot:
     image: dataease/sqlbot
     container_name: sqlbot
     restart: always
     privileged: true
+    networks:
+      - sqlbot-network
     ports:
       - 8000:8000
       - 8001:8001
     environment:
       # Database configuration
-      POSTGRES_SERVER: db
+      POSTGRES_SERVER: localhost
       POSTGRES_PORT: 5432
       POSTGRES_DB: sqlbot
       POSTGRES_USER: root
@@ -41,22 +30,9 @@ services:
       SQL_DEBUG: False
     volumes:
       - ./data/sqlbot/excel:/opt/sqlbot/data/excel
-      - ./data/sqlbot/file:/opt/sqlbot/data/file
       - ./data/sqlbot/images:/opt/sqlbot/images
       - ./data/sqlbot/logs:/opt/sqlbot/app/logs
       - ./data/postgresql:/var/lib/postgresql/data
-    networks:
-      - sqlbot-network
-  app:
-    image: dataease/sqlbot-embedded-demo:dev
-    container_name: sqlbot-embedded-demo
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    volumes:
-      - ./data/app:/usr/src/app
-    networks:
-      - sqlbot-network
 
 networks:
   sqlbot-network:
