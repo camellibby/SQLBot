@@ -372,31 +372,46 @@
               </span>
             </template>
           </div>
-          <el-input
-            ref="inputRef"
-            v-model="inputMessage"
-            :disabled="isTyping"
-            clearable
-            class="input-area"
-            :class="!isCompletePage && 'is-assistant'"
-            type="textarea"
-            :autosize="{ minRows: 1, maxRows: 8.583 }"
-            :placeholder="t('qa.question_placeholder')"
-            @keydown.enter.exact.prevent="($event: any) => sendMessage($event)"
-            @keydown.ctrl.enter.exact.prevent="handleCtrlEnter"
-          />
+          <div class="input-container">
+            <el-input
+              ref="inputRef"
+              v-model="inputMessage"
+              :disabled="isTyping"
+              clearable
+              class="input-area"
+              :class="!isCompletePage && 'is-assistant'"
+              type="textarea"
+              :autosize="{ minRows: 1, maxRows: 8.583 }"
+              :placeholder="t('qa.question_placeholder')"
+              @keydown.enter.exact.prevent="($event: any) => sendMessage($event)"
+              @keydown.ctrl.enter.exact.prevent="handleCtrlEnter"
+            />
+          </div>
 
-          <el-button
-            circle
-            type="primary"
-            class="input-icon"
-            :disabled="isTyping"
-            @click.stop="sendMessage"
-          >
-            <el-icon size="16">
-              <icon_send_filled />
-            </el-icon>
-          </el-button>
+          <div class="input-buttons">
+            <el-button
+              circle
+              :type="isRecording ? 'danger' : 'default'"
+              class="input-icon"
+              :disabled="isTyping"
+              @click.stop="toggleRecording"
+            >
+              <el-icon size="16">
+                <icon_microphone_outlined />
+              </el-icon>
+            </el-button>
+            <el-button
+              circle
+              type="primary"
+              class="input-icon"
+              :disabled="isTyping"
+              @click.stop="sendMessage"
+            >
+              <el-icon size="16">
+                <icon_send_filled />
+              </el-icon>
+            </el-button>
+          </div>
         </div>
       </el-footer>
     </el-container>
@@ -430,6 +445,7 @@ import icon_start_outlined from '@/assets/svg/icon_start_outlined.svg'
 import logo_fold from '@/assets/svg/logo-custom_small.svg'
 import logo from '@/assets/LOGO.svg'
 import icon_send_filled from '@/assets/svg/icon_send_filled.svg'
+import icon_microphone_outlined from '@/assets/svg/icon_microphone_outlined.svg'
 import { useAssistantStore } from '@/stores/assistant'
 import { onClickOutside } from '@vueuse/core'
 import { useUserStore } from '@/stores/user'
@@ -466,6 +482,18 @@ const customName = computed(() => {
 const { t } = useI18n()
 
 const inputMessage = ref('')
+import type { RecorderManager, RecorderManagerConstructor } from '@/utils/voice/types'
+
+import { getWebSocketUrl, parseResult, type RtasrConfig } from '@/utils/voice/rtasr'
+
+const isRecording = ref(false)
+let recorder: RecorderManager | null = null
+let rtasrWs: WebSocket | null = null
+
+const rtasrConfig: RtasrConfig = {
+  appId: '00cc8fa8',
+  apiKey: '224fdad89eae7bdb672553f376bd32ea'
+}
 
 const chatListRef = ref()
 const innerRef = ref()
@@ -1010,6 +1038,101 @@ function jumpCreatChat() {
   }
 }
 
+const connectWebSocket = () => {
+  const websocketUrl = getWebSocketUrl(rtasrConfig)
+  if (!('WebSocket' in window)) {
+    ElMessage.error(t('Browser does not support WebSocket'))
+    return false
+  }
+
+  rtasrWs = new WebSocket(websocketUrl)
+  rtasrWs.onopen = async () => {
+    try {
+      await recorder?.start({
+        sampleRate: 16000,
+        frameSize: 1280,
+        arrayBufferType: 'short16',
+      })
+    } catch (error) {
+      console.error('Failed to start recording:', error)
+      ElMessage.error(t('Failed to start recording'))
+      rtasrWs?.close()
+    }
+  }
+
+  rtasrWs.onmessage = (e) => {
+    const result = parseResult(e.data)
+    if (result) {
+      inputMessage.value += result
+    }
+  }
+
+  rtasrWs.onerror = (e) => {
+    console.error('WebSocket error:', e)
+    recorder?.stop()
+    isRecording.value = false
+    ElMessage.error(t('Voice recognition error'))
+  }
+
+  rtasrWs.onclose = () => {
+    recorder?.stop()
+    isRecording.value = false
+    rtasrWs = null
+  }
+
+  return true
+}
+
+const initializeRecorder = async (): Promise<RecorderManager | null> => {
+  try {
+    const { default: RecorderManager } = (await import('@/utils/voice/recorder')) as unknown as {
+      default: RecorderManagerConstructor
+    }
+    const newRecorder = new RecorderManager('/voice')
+    newRecorder.onStart = () => {
+      isRecording.value = true
+    }
+    newRecorder.onStop = () => {
+      isRecording.value = false
+      if (rtasrWs?.readyState === WebSocket.OPEN) {
+        rtasrWs.send('{"end": true}')
+        rtasrWs.close()
+      }
+    }
+    newRecorder.onFrameRecorded = (data: { isLastFrame: boolean; frameBuffer: ArrayBuffer }) => {
+      if (rtasrWs?.readyState === WebSocket.OPEN) {
+        rtasrWs.send(new Int8Array(data.frameBuffer))
+        if (data.isLastFrame) {
+          rtasrWs.send('{"end": true}')
+          rtasrWs.close()
+        }
+      }
+    }
+    return newRecorder
+  } catch (error) {
+    console.error('Failed to initialize recorder:', error)
+    ElMessage.error(t('Failed to initialize voice recorder'))
+    return null
+  }
+}
+
+const toggleRecording = async () => {
+  if (isRecording.value) {
+    recorder?.stop()
+    return
+  }
+
+  if (!recorder) {
+    recorder = await initializeRecorder()
+    if (!recorder) return
+  }
+
+  if (!connectWebSocket()) {
+    ElMessage.error(t('Failed to connect to voice service'))
+    return
+  }
+}
+
 onMounted(() => {
   getChatList(jumpCreatChat)
   assistantPrepareInit()
@@ -1134,42 +1257,65 @@ onMounted(() => {
         }
       }
 
-      .input-area {
-        border-color: #d9dcdf;
+      .input-container {
+        position: relative;
+        width: 100%;
 
-        :deep(.ed-textarea__inner) {
-          padding: 42px 12px 52px 12px;
-          background: #f8f9fa;
-          border-radius: 16px;
-          line-height: 24px;
-        }
+        .input-area {
+          border-color: #d9dcdf;
+          width: 100%;
 
-        &.is-assistant {
           :deep(.ed-textarea__inner) {
-            padding: 12px 12px 52px 12px;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 24px;
+            padding: 42px 12px 52px 12px;
+            background: #f8f9fa;
             border-radius: 16px;
+            line-height: 24px;
+          }
 
-            &::placeholder {
-              color: #8f959e;
+          &.is-assistant {
+            :deep(.ed-textarea__inner) {
+              padding: 12px 12px 52px 12px;
+              font-weight: 400;
+              font-size: 16px;
+              line-height: 24px;
+              border-radius: 16px;
+
+              &::placeholder {
+                color: #8f959e;
+              }
             }
           }
         }
+
+        .temp-text {
+          position: absolute;
+          bottom: 52px;
+          left: 12px;
+          right: 12px;
+          color: #8f959e;
+          font-size: 14px;
+          line-height: 20px;
+          white-space: pre-wrap;
+          word-break: break-all;
+          pointer-events: none;
+        }
       }
 
-      .input-icon {
-        min-width: unset;
+      .input-buttons {
         position: absolute;
         bottom: 12px;
         right: 12px;
+        display: flex;
+        gap: 8px;
 
-        border-color: unset;
-
-        &.is-disabled {
-          background: rgba(187, 191, 196, 1);
+        .input-icon {
+          min-width: unset;
           border-color: unset;
+
+          &.is-disabled {
+            background: rgba(187, 191, 196, 1);
+            border-color: unset;
+          }
         }
       }
     }
