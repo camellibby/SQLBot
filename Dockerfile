@@ -1,6 +1,6 @@
 # Build sqlbot
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
-FROM dataease/sqlbot-base:latest AS sqlbot-builder
+FROM registry.cn-qingdao.aliyuncs.com/dataease/sqlbot-base:latest AS sqlbot-builder
 
 # Set build environment variables
 ENV PYTHONUNBUFFERED=1
