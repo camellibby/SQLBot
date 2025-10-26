@@ -326,6 +326,19 @@
                     <template #tool>
                       <ChatToolBar v-if="!message.isTyping" :message="message" />
                     </template>
+                    <template #footer>
+                      <RecommendQuestion
+                        ref="recommendQuestionRef"
+                        :current-chat="currentChat"
+                        :record-id="message.record?.id"
+                        :questions="message.recommended_question"
+                        :first-chat="message.first_chat"
+                        :disabled="isTyping"
+                        @click-question="quickAsk"
+                        @loading-over="loadingOver"
+                        @stop="onChatStop"
+                      />
+                    </template>
                   </AnalysisAnswer>
                   <PredictAnswer
                     v-if="
@@ -346,6 +359,19 @@
                     <ErrorInfo :error="message.record?.error" class="error-container" />
                     <template #tool>
                       <ChatToolBar v-if="!message.isTyping" :message="message" />
+                    </template>
+                    <template #footer>
+                      <RecommendQuestion
+                        ref="recommendQuestionRef"
+                        :current-chat="currentChat"
+                        :record-id="message.record?.id"
+                        :questions="message.recommended_question"
+                        :first-chat="message.first_chat"
+                        :disabled="isTyping"
+                        @click-question="quickAsk"
+                        @loading-over="loadingOver"
+                        @stop="onChatStop"
+                      />
                     </template>
                   </PredictAnswer>
                 </template>
@@ -793,6 +819,7 @@ const sendMessage = async ($event: any = {}) => {
   currentRecord.chart_answer = ''
   currentRecord.chart = ''
 
+  console.log('sendMessage', currentRecord)
   currentChat.value.records.push(currentRecord)
   inputMessage.value = ''
 
@@ -826,7 +853,7 @@ async function onAnalysisAnswerFinish(id: number) {
   loading.value = false
   isTyping.value = false
   console.debug(id)
-  //await getRecommendQuestions(id)
+  await getRecommendQuestions(id)
 }
 function onAnalysisAnswerError() {
   loading.value = false
@@ -886,7 +913,7 @@ async function onPredictAnswerFinish(id: number) {
   loading.value = false
   isTyping.value = false
   console.debug('onPredictAnswerFinish: ', id)
-  //await getRecommendQuestions(id)
+  await getRecommendQuestions(id)
 }
 function onPredictAnswerError() {
   loading.value = false
