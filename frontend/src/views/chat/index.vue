@@ -770,6 +770,11 @@ const sendMessage = async ($event: any = {}) => {
   }
   if (!inputMessage.value.trim()) return
 
+  // 如果正在录音，先停止录音
+  if (isRecording.value) {
+    recorder?.stop()
+  }
+
   loading.value = true
   isTyping.value = true
   if (isCompletePage.value && innerRef.value) {
