@@ -519,7 +519,7 @@
     "new_conversation": "新会话",
     "send": "发送",
     "stop_replying": "停止回复",
-    "i_am_sqlbot": "你好，我是小业",
+    "i_am_sqlbot": "你好，我是理工小业",
     "predict_data_etc": "我可以查询数据、生成图表、分析数据、预测数据等。",
     "intelligent_data_query": "赶快开启智能问数吧～"
   },
@@ -588,7 +588,7 @@
     "new_conversation": "新建对话",
     "send": "发送",
     "stop_replying": "停止回答",
-    "i_am_sqlbot": "你好，我是小业",
+    "i_am_sqlbot": "你好，我是理工小业",
     "predict_data_etc": "我可以查询数据、生成图表、检测数据异常、预测数据等",
     "intelligent_data_query": "赶快开启智能问数吧～",
     "origin_format_error": "格式错误，http或https开头，不能以 / 结尾",
