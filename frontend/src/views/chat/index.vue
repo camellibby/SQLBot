@@ -153,15 +153,15 @@
                 v-if="logoAssistant"
                 :src="logoAssistant"
                 class="logo"
-                width="250px"
-                height="250px"
+                width="300px"
+                height="300px"
                 alt=""
               />
               <el-icon v-else size="32">
                 <logo_fold />
               </el-icon>
-              <div class="i-am">{{ welcome }}</div>
-              <div class="i-can">{{ welcomeDesc }}</div>
+              <div class="i-am" style="font-size: 30px">{{ welcome }}</div>
+              <div class="i-can" style="font-size: 17px">{{ welcomeDesc }}</div>
             </div>
 
             <el-button
